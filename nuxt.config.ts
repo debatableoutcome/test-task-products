@@ -1,6 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+// nuxt.config.ts
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image']
-})
+  modules: ["@nuxtjs/device", "@nuxt/image", "@nuxt/eslint"],
+  css: [
+    "vuetify/lib/styles/main.sass",
+    "@mdi/font/css/materialdesignicons.min.css",
+  ],
+  build: {
+    transpile: ["vuetify"],
+  },
+  typescript: {
+    strict: true,
+  },
+});
