@@ -1,4 +1,3 @@
-// nuxt.config.ts
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/device", "@nuxt/image", "@nuxt/eslint"],
@@ -23,6 +22,9 @@ export default defineNuxtConfig({
           additionalData: '@use "~/assets/styles/variables.scss" as *;',
         },
       },
+    },
+    optimizeDeps: {
+      include: ["jwt-decode"],
     },
   },
 

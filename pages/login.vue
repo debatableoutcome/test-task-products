@@ -1,3 +1,4 @@
+<!-- pages/login.vue -->
 <template>
   <v-container class="fill-height">
     <v-row justify="center" align="center">
@@ -7,53 +8,46 @@
             <h2>Авторизация</h2>
           </v-card-title>
           <v-card-text>
-            <v-form @submit.prevent="handleLogin">
-              <v-alert
-                v-if="auth.error"
-                type="error"
-                class="mb-4"
-                density="compact"
-                variant="tonal"
-              >
-                {{ auth.error }}
-              </v-alert>
+            <div
+              v-if="errorMessage"
+              class="text-error mb-4 pa-3 bg-error-lighten-4 rounded"
+            >
+              {{ errorMessage }}
+            </div>
 
-              <v-text-field
-                v-model="form.username"
-                label="Логин"
-                :rules="[(v) => !!v || 'Логин обязателен']"
-                variant="outlined"
-                :disabled="auth.loading"
-                class="mb-4"
-              ></v-text-field>
+            <v-text-field
+              v-model="username"
+              label="Логин"
+              variant="outlined"
+              :disabled="loading"
+              class="mb-4"
+            ></v-text-field>
 
-              <v-text-field
-                v-model="form.password"
-                label="Пароль"
-                type="password"
-                :rules="[(v) => !!v || 'Пароль обязателен']"
-                variant="outlined"
-                :disabled="auth.loading"
-                class="mb-6"
-              ></v-text-field>
+            <v-text-field
+              v-model="password"
+              label="Пароль"
+              type="password"
+              variant="outlined"
+              :disabled="loading"
+              class="mb-6"
+            ></v-text-field>
 
-              <v-btn
-                :loading="auth.loading"
-                block
-                color="primary"
-                size="large"
-                type="submit"
-                class="mb-2"
-              >
-                Войти
-              </v-btn>
+            <v-btn
+              block
+              color="primary"
+              size="large"
+              @click="handleLogin"
+              :disabled="loading"
+              class="mb-2"
+            >
+              {{ loading ? "Вход..." : "Войти" }}
+            </v-btn>
 
-              <div class="text-caption text-center mt-4">
-                Для тестового входа используйте:<br />
-                Логин: admin<br />
-                Пароль: secret
-              </div>
-            </v-form>
+            <div class="text-caption text-center mt-4">
+              Для тестового входа используйте:<br />
+              Логин: admin<br />
+              Пароль: secret
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -62,20 +56,19 @@
 </template>
 
 <script setup lang="ts">
-const auth = useAuth();
+const { login, isLoading, errorMessage, isAuthenticated } = useAuth();
 
-const form = reactive({
-  username: "",
-  password: "",
-});
+const loading = computed(() => isLoading.value);
+const username = ref("");
+const password = ref("");
 
 const handleLogin = async () => {
-  if (!form.username || !form.password) return;
-  await auth.login(form.username, form.password);
+  if (!username.value || !password.value) return;
+  await login(username.value, password.value);
 };
 
 onMounted(() => {
-  if (auth.isAuthenticated()) {
+  if (isAuthenticated()) {
     navigateTo("/products");
   }
 });

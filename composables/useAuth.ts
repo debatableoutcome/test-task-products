@@ -1,12 +1,14 @@
+import { jwtDecode } from "jwt-decode";
+
 export const useAuth = () => {
-  const user = ref(null);
+  const user = useState("user", () => null);
   const token = useCookie("token");
-  const loading = ref(false);
-  const error = ref("");
+  const isLoading = useState("isLoading", () => false);
+  const errorMessage = useState("errorMessage", () => "");
 
   const login = async (username: string, password: string) => {
-    loading.value = true;
-    error.value = "";
+    isLoading.value = true;
+    errorMessage.value = "";
 
     try {
       if (username === "admin" && password === "secret") {
@@ -20,14 +22,15 @@ export const useAuth = () => {
         navigateTo("/products");
         return true;
       } else {
-        error.value = "Неверный логин или пароль";
+        errorMessage.value = "Неверный логин или пароль";
         return false;
       }
     } catch (e) {
-      error.value = "Произошла ошибка при авторизации";
+      errorMessage.value = "Произошла ошибка при авторизации";
+      console.error("Auth error:", e);
       return false;
     } finally {
-      loading.value = false;
+      isLoading.value = false;
     }
   };
 
@@ -45,8 +48,8 @@ export const useAuth = () => {
     user,
     login,
     logout,
-    loading,
-    error,
+    isLoading,
+    errorMessage,
     isAuthenticated,
   };
 };
