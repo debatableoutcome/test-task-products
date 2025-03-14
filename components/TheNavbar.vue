@@ -1,8 +1,8 @@
 <template>
-  <v-app-bar color="#FFF7EB" elevation="0" height="72">
-    <div class="d-flex align-center w-100 px-4">
-      <div class="logo-container mr-6">
-        <v-img src="/images/logo.svg" width="100" height="32"></v-img>
+  <v-app-bar color="#FFF7EB" elevation="0" height="64">
+    <div class="d-flex align-center w-100 px-8">
+      <div class="logo-container mr-3">
+        <v-img src="/images/logo.svg" width="156" height="48"></v-img>
       </div>
 
       <v-btn
@@ -11,18 +11,18 @@
         rounded="pill"
         variant="flat"
       >
-        <v-icon class="mr-2">mdi-view-grid-outline</v-icon>
+        <v-img src="/icons/tiles.svg" alt="Tiles" class="tiles-icon"></v-img>
         {{ categoriesText }}
       </v-btn>
 
       <v-spacer></v-spacer>
 
       <div class="location-container d-flex align-center">
-        <v-icon>mdi-map-marker-outline</v-icon>
-        <span class="ml-2 pr-4">{{ cityName }}</span>
+        <img src="/icons/pin.svg" alt="Pin" class="pin-icon" />
+        <span class="ml-1 mr-6">{{ cityName }}</span>
       </div>
 
-      <v-divider vertical class="mx-4" thickness="1"></v-divider>
+      <v-divider class="mr-3" vertical thickness="1"></v-divider>
 
       <v-btn color="#337566" class="post-ad-btn" rounded="pill">
         {{ postAdText }}
@@ -90,12 +90,16 @@ defineProps({
   padding: 0 0 0 12px;
 }
 
+.tiles-icon,
 .burger-icon {
   width: 24px;
   height: 24px;
   margin-right: 8px;
 }
-
+.pin-icon {
+  width: 16px;
+  height: 16px;
+}
 .profile-pic {
   width: 40px;
   height: 40px;

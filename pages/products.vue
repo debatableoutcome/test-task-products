@@ -1,5 +1,9 @@
 <template>
   <TheNavbar />
+  <TheFooter
+    copyrightText="Annonce 2023"
+    :links="['Документы', 'О компании']"
+  />
 </template>
 
 <script setup lang="ts"></script>
