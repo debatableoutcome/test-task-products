@@ -1,4 +1,3 @@
-<!-- pages/products.vue -->
 <template>
   <v-container>
     <h1>Товары и услуги</h1>
