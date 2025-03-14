@@ -1,0 +1,47 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+// Базовые шрифтовые правила
+$font-family-base: "Inter", sans-serif;
+
+// Миксины для типографики
+@mixin font-base {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+@mixin font-medium {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+@mixin font-semibold {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+@mixin heading-1 {
+  font-family: $font-family-base;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@mixin heading-2 {
+  font-family: $font-family-base;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@mixin heading-3 {
+  font-family: $font-family-base;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+}

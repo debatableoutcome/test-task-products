@@ -1,0 +1,16 @@
+@import "./variables.scss";
+@import "./typography.scss";
+
+body {
+  @include font-base;
+}
+
+.v-btn {
+  @include font-medium;
+  text-transform: none !important;
+}
+
+.section-title {
+  @include heading-2;
+  margin-bottom: 1rem;
+}
