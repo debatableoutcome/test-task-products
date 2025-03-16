@@ -28,9 +28,47 @@
       </div>
     </div>
     <div class="actions mt-5">
-      <v-btn color="#337566" variant="flat" rounded="lg" class="contact-btn">
-        {{ contactBtnText }}
-      </v-btn>
+      <div class="phone-action-container">
+        <v-btn
+          color="#337566"
+          variant="flat"
+          rounded="lg"
+          class="contact-btn"
+          @click="togglePhone"
+        >
+          {{ isPhoneVisible ? "Скрыть номер телефона" : contactBtnText }}
+        </v-btn>
+
+        <v-slide-y-transition>
+          <div v-if="isPhoneVisible" class="phone-popup">
+            <div class="phone-popup-content">
+              <span class="phone-number">{{ phoneNumber }}</span>
+              <div class="phone-actions">
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="#337566"
+                  @click="copyPhoneToClipboard"
+                  class="copy-btn"
+                >
+                  <v-icon size="small" class="mr-1">mdi-content-copy</v-icon>
+                  Копировать
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="#52525b"
+                  @click="callPhone"
+                  class="call-btn"
+                >
+                  <v-icon size="small" class="mr-1">mdi-phone</v-icon>
+                  Позвонить
+                </v-btn>
+              </div>
+            </div>
+          </div>
+        </v-slide-y-transition>
+      </div>
     </div>
     <div class="navigation-tabs mt-6">
       <v-btn
@@ -45,10 +83,22 @@
         <span v-if="tab.count" class="tab-count ml-1">{{ tab.count }}</span>
       </v-btn>
     </div>
+
+    <!-- Снэкбар для уведомления о копировании -->
+    <v-snackbar
+      v-model="showCopySnackbar"
+      :timeout="2000"
+      color="#337566"
+      location="top"
+    >
+      Номер скопирован в буфер обмена
+    </v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
 const props = defineProps({
   logo: {
     type: String,
@@ -78,6 +128,10 @@ const props = defineProps({
     type: String,
     default: "Показать номер телефона",
   },
+  phoneNumber: {
+    type: String,
+    default: "+7 (999) 123-45-67",
+  },
   tabs: {
     type: Array,
     default: () => [
@@ -93,6 +147,23 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:activeTab"]);
+
+const isPhoneVisible = ref(false);
+const showCopySnackbar = ref(false);
+
+const togglePhone = () => {
+  isPhoneVisible.value = !isPhoneVisible.value;
+};
+
+const copyPhoneToClipboard = () => {
+  navigator.clipboard.writeText(props.phoneNumber).then(() => {
+    showCopySnackbar.value = true;
+  });
+};
+
+const callPhone = () => {
+  window.location.href = `tel:${props.phoneNumber.replace(/\D/g, "")}`;
+};
 
 const updateTab = (index) => {
   emit("update:activeTab", index);
@@ -148,6 +219,11 @@ const updateTab = (index) => {
   margin: 0 8px;
 }
 
+.phone-action-container {
+  position: relative;
+  width: 100%;
+}
+
 .contact-btn {
   height: 56px;
   font-family: "Inter", sans-serif;
@@ -156,6 +232,46 @@ const updateTab = (index) => {
   text-transform: none;
   letter-spacing: 0;
   color: white;
+  width: 100%;
+  min-width: 240px;
+}
+
+.phone-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.phone-popup-content {
+  padding: 16px;
+}
+
+.phone-number {
+  display: block;
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #18181b;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.phone-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.copy-btn,
+.call-btn {
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .navigation-tabs {

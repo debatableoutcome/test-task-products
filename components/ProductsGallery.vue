@@ -65,8 +65,8 @@ watchEffect(() => {
 
 <style scoped>
 .products-gallery {
-  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 32px;
 }
 
 .select-container {
@@ -82,7 +82,7 @@ watchEffect(() => {
 }
 
 .product-item {
-  display: flex;
+  width: 100%;
 }
 
 .no-products {
@@ -95,7 +95,7 @@ watchEffect(() => {
 
 @media (max-width: 1200px) {
   .products-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

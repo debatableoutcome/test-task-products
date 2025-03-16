@@ -31,6 +31,7 @@
         block
         class="view-btn"
         :disabled="isHidden"
+        @click="showDevDialog"
       >
         Просмотреть
       </v-btn>
@@ -39,6 +40,10 @@
 </template>
 
 <script setup lang="ts">
+import { useDevDialog } from "~/composables/useDevDialog";
+
+const { showDevDialog } = useDevDialog();
+
 defineProps({
   image: {
     type: String,
@@ -74,7 +79,7 @@ defineProps({
   },
 });
 
-const formatPrice = (price) => {
+const formatPrice = (price: number): string => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 };
 </script>

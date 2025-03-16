@@ -1,9 +1,10 @@
 <template>
   <v-app>
-    <v-main>
-      <NuxtPage />
-    </v-main>
+    <NuxtPage />
+    <DevDialog />
   </v-app>
 </template>
 
-<script setup lang="ts"></script>
+<script setup>
+import DevDialog from "~/components/DevDialog.vue";
+</script>

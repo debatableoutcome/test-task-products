@@ -13,7 +13,7 @@
     @update:activeTab="updateActiveTab"
   />
 
-  <v-container class="py-6" v-if="activeTab === 0">
+  <v-container class="content-container py-6" v-if="activeTab === 0">
     <ProductsGallery :products="products" :categories="categories" />
   </v-container>
 
@@ -32,10 +32,11 @@
     copyrightText="Annonce 2023"
     :links="['Документы', 'О компании']"
   />
+  <DevDialog ref="devDialog" />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 const tabs = [
   { label: "Товары и услуги", count: null },
@@ -147,7 +148,7 @@ const agentsLoaded = ref(false);
 
 const companyData = ref({
   description:
-    "Копкой занимаемся 15 лет. Все началось с хобби и плавно переросло в любимую работу. Работаем с профессиональной техникой.",
+    "Копкой занимаемся 15 лет. Все началось с хобби и плавно переросло в любимую работу. Работаем с профессиональной техникой.",
   hours: "Сегодня с 8:00 до 23:00",
   address: "Ростов на Дону, Воронежская ул., 42А корп. 1",
   todayHours: "Сегодня с 8:00 до 23:00",
@@ -206,7 +207,7 @@ onMounted(() => {
           },
 
           {
-            id: 5,
+            id: 6,
             name: "Феофан Кусакин",
             rating: "4.7",
             reviews: "8 отзывов",
@@ -249,5 +250,11 @@ onMounted(() => {
 
 :deep(.v-btn__content) {
   letter-spacing: normal;
+}
+
+.content-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: 100% !important;
 }
 </style>

@@ -12,7 +12,7 @@
         <v-expansion-panel-title class="hours-title">
           <div>
             <h2 class="section-title">Режим работы</h2>
-            <p class="today-hours">{{ company.todayHours }}</p>
+            <p class="today-hours">{{ todayHoursMessage }}</p>
           </div>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
@@ -47,20 +47,47 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
   company: {
     type: Object,
     required: true,
     default: () => ({
       description:
         "Копией занимаемся 15 лет. Все началось с хобби и плавно переросло в любимую работу. Работаем с профессиональной техникой.",
-      todayHours: "Сегодня с 8:00 до 23:00",
       weekdayHours: "с 8:00 до 23:00",
       saturdayHours: "с 9:00 до 21:00",
       sundayHours: "выходной",
       address: "Ростов на Дону, Воронежская ул., 42А корп. 1",
     }),
   },
+});
+
+// Определяем текущий день недели и возвращаем соответствующее сообщение о часах работы
+const todayHoursMessage = computed(() => {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 - воскресенье, 1 - понедельник, и т.д.
+
+  const options: Intl.DateTimeFormatOptions = { weekday: "long" };
+  const dayName = new Intl.DateTimeFormat("ru-RU", options).format(today);
+  const capitalizedDayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+
+  let hoursText = "";
+
+  if (dayOfWeek === 0) {
+    hoursText = props.company.sundayHours;
+  } else if (dayOfWeek === 6) {
+    hoursText = props.company.saturdayHours;
+  } else {
+    hoursText = props.company.weekdayHours;
+  }
+
+  if (hoursText.toLowerCase().includes("выходной")) {
+    return `Сегодня (${capitalizedDayName}) - выходной`;
+  }
+
+  return `Сегодня (${capitalizedDayName}) ${hoursText}`;
 });
 </script>
 
