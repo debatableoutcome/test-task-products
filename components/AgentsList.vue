@@ -3,11 +3,11 @@
     <div v-for="agent in agents" :key="agent.id" class="agent-item">
       <AgentCard
         :name="agent.name"
-        :position="agent.position"
-        :phone="agent.phone"
+        :verified="agent.verified"
+        :rating="agent.rating"
+        :reviews="agent.reviews"
         :photo="agent.photo"
-        :rating="agent.rating || 4.7"
-        :reviews-count="agent.reviewsCount || 19"
+        :text="agent.text"
       />
     </div>
   </div>

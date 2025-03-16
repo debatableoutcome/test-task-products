@@ -1,138 +1,183 @@
 <template>
-  <v-card class="product-card" :to="productLink">
-    <div class="image-container">
-      <v-img
-        :src="product.image"
-        cover
-        height="160"
-        class="product-image"
-      ></v-img>
-      <div class="stats-overlay">
-        <div class="views">
+  <div class="product-card">
+    <div class="product-image-container">
+      <img :src="image" :alt="title" class="product-image" />
+      <div class="product-stats">
+        <div class="views-stat">
           <v-icon size="small" color="white">mdi-eye</v-icon>
-          <span>{{ product.views }}</span>
+          <span>{{ views }}</span>
         </div>
-        <div class="date">
+        <div class="date-stat">
           <v-icon size="small" color="white">mdi-calendar</v-icon>
-          <span>{{ product.date }}</span>
+          <span>{{ date }}</span>
         </div>
       </div>
     </div>
-    <v-card-text class="pa-3">
-      <div class="price mb-1">{{ formatPrice(product.price) }} ₽</div>
-      <div class="title mb-2">{{ product.title }}</div>
-      <div class="description text-caption text-truncate">
-        {{ product.description }}
+
+    <div class="product-info">
+      <div class="product-price">{{ formatPrice(price) }}</div>
+      <h3 class="product-title">{{ title }}</h3>
+      <p class="product-description">{{ description }}</p>
+    </div>
+
+    <div class="product-footer">
+      <div v-if="isSold" class="product-status">
+        Объявление {{ isHidden ? "скрыто" : "продается" }}
       </div>
-    </v-card-text>
-    <v-card-actions class="px-3 pb-3 pt-0">
       <v-btn
+        v-else
+        variant="outlined"
         color="#337566"
-        variant="flat"
-        rounded="lg"
         block
-        class="promote-btn"
+        class="view-btn"
+        :disabled="isHidden"
       >
-        {{ promoteBtnText }}
+        Просмотреть
       </v-btn>
-    </v-card-actions>
-  </v-card>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-    default: () => ({
-      id: 1,
-      image: "",
-      views: 0,
-      date: "",
-      price: 0,
-      title: "",
-      description: "",
-    }),
-  },
-  promoteBtnText: {
+defineProps({
+  image: {
     type: String,
-    default: "Продвигать",
+    required: true,
+  },
+  views: {
+    type: Number,
+    default: 0,
+  },
+  date: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    default: "",
+  },
+  isSold: {
+    type: Boolean,
+    default: false,
+  },
+  isHidden: {
+    type: Boolean,
+    default: false,
   },
 });
 
-const productLink = computed(() => `/product/${props.product.id}`);
-
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("ru-RU").format(price);
+const formatPrice = (price) => {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/assets/styles/mixins/line-clamp.scss";
+
 .product-card {
+  background-color: white;
   border-radius: 12px;
   overflow: hidden;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.image-container {
-  position: relative;
-}
-
-.stats-overlay {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
+  border: 1px solid #e5e5e5;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
 }
 
-.views,
-.date {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 8px;
-  padding: 2px 8px;
-  font-size: 12px;
+.product-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  background-color: #f5f5f5;
+}
+
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-stats {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.views-stat,
+.date-stat {
   display: flex;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  padding: 2px 6px;
+
+  span {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    color: white;
+    margin-left: 4px;
+  }
 }
 
-.views span,
-.date span {
-  margin-left: 4px;
+.product-info {
+  padding: 12px 16px;
+  flex-grow: 1;
 }
 
-.price {
-  font-size: 18px;
-  font-weight: 700;
+.product-price {
+  font-family: "Inter", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
   color: #18181b;
+  margin-bottom: 4px;
 }
 
-.title {
+.product-title {
+  font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 500;
-  color: #27272a;
-  line-height: 1.3;
+  color: #18181b;
+  margin: 0 0 4px 0;
+  @include line-clamp(2);
 }
 
-.description {
+.product-description {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   color: #71717a;
+  margin: 0;
+  @include line-clamp(2);
 }
 
-.promote-btn {
-  text-transform: none;
+.product-footer {
+  padding: 0 16px 16px;
+}
+
+.product-status {
   font-family: "Inter", sans-serif;
   font-size: 14px;
+  font-weight: 400;
+  color: #71717a;
+  text-align: center;
+}
+
+.view-btn {
+  text-transform: none;
   font-weight: 500;
   letter-spacing: 0;
-  color: white;
 }
 </style>

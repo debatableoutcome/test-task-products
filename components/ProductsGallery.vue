@@ -1,16 +1,65 @@
 <template>
   <div class="products-gallery">
-    <h2 class="text-h5 mb-4">Товары и услуги</h2>
-    <p>Здесь будет галерея товаров</p>
+    <div class="select-container">
+      <CategorySelect
+        :categories="categories"
+        v-model="selectedCategoryId"
+        @update:modelValue="filterProducts"
+      />
+    </div>
+
+    <div class="products-grid">
+      <div
+        v-for="product in filteredProducts"
+        :key="product.id"
+        class="product-item"
+      >
+        <ProductCard
+          :image="product.image"
+          :views="product.views"
+          :date="product.date"
+          :price="product.price"
+          :title="product.title"
+          :description="product.description"
+          :isSold="product.isSold"
+          :isHidden="product.isHidden"
+        />
+      </div>
+    </div>
+
+    <div v-if="filteredProducts.length === 0" class="no-products">
+      <p>Нет товаров в выбранной категории</p>
+    </div>
   </div>
 </template>
 
-<script setup>
-defineProps({
+<script setup lang="ts">
+const props = defineProps({
   products: {
     type: Array,
-    default: () => [],
+    required: true,
   },
+  categories: {
+    type: Array,
+    required: true,
+  },
+});
+
+const selectedCategoryId = ref("all");
+const filteredProducts = ref([...props.products]);
+
+const filterProducts = () => {
+  if (selectedCategoryId.value === "all") {
+    filteredProducts.value = [...props.products];
+  } else {
+    filteredProducts.value = props.products.filter(
+      (product) => product.categoryId === selectedCategoryId.value
+    );
+  }
+};
+
+watchEffect(() => {
+  filterProducts();
 });
 </script>
 
@@ -18,5 +67,47 @@ defineProps({
 .products-gallery {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.select-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.product-item {
+  display: flex;
+}
+
+.no-products {
+  text-align: center;
+  padding: 48px 0;
+  color: #71717a;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+}
+
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

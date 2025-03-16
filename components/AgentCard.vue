@@ -4,36 +4,29 @@
       <img :src="photo" :alt="name" class="agent-photo" />
     </div>
     <div class="agent-info">
-      <div class="agent-header">
-        <h3 class="agent-name">{{ name }}</h3>
+      <h3 class="agent-name">{{ name }}</h3>
+
+      <div class="agent-details">
+        <div v-if="verified" class="agent-verified">
+          <img src="/icons/verified.svg" alt="Verified" class="verified-icon" />
+          <span class="verified-text">Документы проверены</span>
+        </div>
+
         <div class="agent-rating">
           <div class="rating-container">
             <img src="/icons/star.svg" alt="Rating" class="rating-icon" />
             <span class="rating-value">{{ rating }}</span>
-            <span class="reviews-count">({{ reviewsCount }} отзывов)</span>
           </div>
         </div>
+
+        <div class="agent-reviews">
+          <span class="reviews-count">{{ reviews }}</span>
+        </div>
       </div>
-      <p class="agent-position">{{ position }}</p>
+
       <p class="agent-description">
-        Помогу подобрать участок в организации, похороню его тело или прах если
-        есть,
-        <span class="agent-description-more"
-          >подскажу, какие деньги вы потратите и т.п...</span
-        >
+        {{ text }}
       </p>
-      <div class="agent-contact">
-        <div class="agent-phone">{{ phone }}</div>
-        <v-btn
-          class="agent-message-btn"
-          variant="outlined"
-          color="#337566"
-          size="small"
-          rounded
-        >
-          Написать
-        </v-btn>
-      </div>
     </div>
   </div>
 </template>
@@ -44,34 +37,37 @@ defineProps({
     type: String,
     required: true,
   },
-  position: {
-    type: String,
-    required: true,
+  verified: {
+    type: Boolean,
+    default: false,
   },
-  phone: {
+  rating: {
     type: String,
-    required: true,
+    default: "4.7",
+  },
+  reviews: {
+    type: String,
+    default: "19 отзывов",
   },
   photo: {
     type: String,
     required: true,
   },
-  rating: {
-    type: Number,
-    default: 4.7,
-  },
-  reviewsCount: {
-    type: Number,
-    default: 19,
+  text: {
+    type: String,
+    default:
+      "Помог справиться с потерей и организовать похороны для 126 семей ну и еще чуть описания, чтобы дойти до конца строки и текста",
   },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/assets/styles/mixins/line-clamp.scss";
+
 .agent-card {
   display: flex;
   padding: 16px;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   border: 1px solid #e4e4e7;
   border-radius: 12px;
 }
@@ -97,19 +93,46 @@ defineProps({
   flex-direction: column;
 }
 
-.agent-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 4px;
-}
-
 .agent-name {
   font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0%;
   color: #18181b;
-  margin: 0;
+  margin: 0 0 8px 0;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+.agent-details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.agent-verified {
+  display: flex;
+  align-items: center;
+}
+
+.verified-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.verified-text {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #71717a;
+}
+
+.agent-rating {
+  display: flex;
+  align-items: center;
 }
 
 .rating-container {
@@ -125,57 +148,25 @@ defineProps({
 
 .rating-value {
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #18181b;
-  margin-right: 4px;
 }
 
-.reviews-count {
+.agent-reviews {
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   color: #71717a;
-}
-
-.agent-position {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #71717a;
-  margin: 0 0 12px 0;
 }
 
 .agent-description {
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   color: #52525b;
-  margin: 0 0 12px 0;
-}
-
-.agent-description-more {
-  color: #71717a;
-}
-
-.agent-contact {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-}
-
-.agent-phone {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #18181b;
-}
-
-.agent-message-btn {
-  text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0;
+  margin: 0;
+  @include line-clamp(3);
 }
 
 @media (max-width: 600px) {
@@ -191,12 +182,8 @@ defineProps({
     margin-bottom: 16px;
   }
 
-  .agent-header {
-    flex-direction: column;
-  }
-
-  .agent-rating {
-    margin-top: 8px;
+  .agent-details {
+    flex-wrap: wrap;
   }
 }
 </style>
