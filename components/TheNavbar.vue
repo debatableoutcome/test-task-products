@@ -1,6 +1,12 @@
 <template>
   <div>
-    <v-app-bar color="#FFF7EB" elevation="0" height="64">
+    <!-- Desktop -->
+    <v-app-bar
+      v-if="!$device.isMobile"
+      color="#FFF7EB"
+      elevation="0"
+      height="64"
+    >
       <div class="d-flex align-center w-100 px-8">
         <div class="logo-container mr-3" @click="showDevDialog">
           <v-img src="/images/logo.svg" width="156" height="48"></v-img>
@@ -44,6 +50,24 @@
         </div>
       </div>
     </v-app-bar>
+
+    <!-- Mobile-->
+    <div v-else class="mobile-navbar">
+      <div class="mobile-content">
+        <button class="menu-button" @click="showDevDialog">
+          <v-icon>mdi-menu</v-icon>
+        </button>
+
+        <div class="logo" @click="showDevDialog">
+          <v-img src="/images/logo.svg" width="116" height="36"></v-img>
+        </div>
+
+        <div class="bag-wrapper" @click="showDevDialog">
+          <img src="/icons/bag.svg" alt="Bag" class="bag-icon" />
+          <span class="bag-badge">9</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -73,6 +97,7 @@ const { showDevDialog } = useDevDialog();
 </script>
 
 <style scoped>
+/* Desktop styles */
 .categories-btn {
   font-family: "Inter", sans-serif;
   font-size: 15px;
@@ -132,16 +157,65 @@ const { showDevDialog } = useDevDialog();
 .logo-container {
   cursor: pointer;
 }
-@media (max-width: 600px) {
-  .logo-container {
-    display: flex;
-    justify-content: center;
-  }
 
-  .profile-pic {
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-  }
+/* Mob styles */
+.mobile-navbar {
+  background-color: #fff7eb;
+  width: 100%;
+  height: 56px;
+}
+
+.mobile-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bag-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.bag-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.bag-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #337566;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
 }
 </style>

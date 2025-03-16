@@ -1,116 +1,58 @@
 <template>
   <div class="company-header">
-    <div class="header-logo-container">
-      <v-img :src="logo" width="120" height="120" class="header-logo"></v-img>
-    </div>
-    <h1 class="company-name">{{ companyName }}</h1>
-    <div class="company-info">
-      <div class="info-container d-flex align-center">
-        <v-img
-          src="/icons/verified.svg"
-          alt="Verified"
-          width="16"
-          height="16"
-          class="verified-icon mr-1"
-        ></v-img>
-        {{ verifiedText }}
-        <span class="dot-divider"></span>
-        <v-img
-          src="/icons/star.svg"
-          alt="Star"
-          width="16"
-          height="16"
-          class="star-icon mr-1"
-        ></v-img>
-        {{ rating }}
-        <span class="dot-divider"></span>
-        {{ reviewsCount }} {{ reviewsText }}
-      </div>
-    </div>
-    <div class="actions mt-5">
-      <div class="phone-action-container">
-        <v-btn
-          color="#337566"
-          variant="flat"
-          rounded="lg"
-          class="contact-btn"
-          @click="togglePhone"
-        >
-          {{ isPhoneVisible ? "Скрыть номер телефона" : contactBtnText }}
-        </v-btn>
+    <div v-if="!$device.isMobile" class="header-info">
+      <h1 class="company-title">{{ companyName }}</h1>
 
-        <v-slide-y-transition>
-          <div v-if="isPhoneVisible" class="phone-popup">
-            <div class="phone-popup-content">
-              <span class="phone-number">{{ phoneNumber }}</span>
-              <div class="phone-actions">
-                <v-btn
-                  variant="text"
-                  size="small"
-                  color="#337566"
-                  @click="copyPhoneToClipboard"
-                  class="copy-btn"
-                >
-                  <v-icon size="small" class="mr-1">mdi-content-copy</v-icon>
-                  Копировать
-                </v-btn>
-                <v-btn
-                  variant="text"
-                  size="small"
-                  color="#52525b"
-                  @click="callPhone"
-                  class="call-btn"
-                >
-                  <v-icon size="small" class="mr-1">mdi-phone</v-icon>
-                  Позвонить
-                </v-btn>
-              </div>
-            </div>
-          </div>
-        </v-slide-y-transition>
+      <div class="company-verification">
+        <div class="verification-badge">
+          <v-icon color="green" size="small" class="mr-1">
+            mdi-check-circle
+          </v-icon>
+          <span class="verification-text">Документы проверены</span>
+        </div>
+
+        <div class="rating-container">
+          <span class="separator">•</span>
+          <v-icon color="amber" size="small" class="mr-1"> mdi-star </v-icon>
+          <span>{{ rating }}</span>
+          <span class="reviews-count">{{ reviewsCount }} отзывов</span>
+        </div>
       </div>
-    </div>
-    <div class="navigation-tabs mt-6">
+
       <v-btn
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :class="['tab-btn', { 'active-tab': index === activeTab }]"
+        color="#337566"
         variant="outlined"
-        rounded="lg"
-        @click="updateTab(index)"
+        class="contact-btn"
+        @click="showDevDialog"
       >
-        {{ tab.label }}
-        <span v-if="tab.count" class="tab-count ml-1">{{ tab.count }}</span>
+        Показать номер телефона
       </v-btn>
     </div>
 
-    <!-- Снэкбар для уведомления о копировании -->
-    <v-snackbar
-      v-model="showCopySnackbar"
-      :timeout="2000"
-      color="#337566"
-      location="top"
-    >
-      Номер скопирован в буфер обмена
-    </v-snackbar>
+    <div class="tabs-section" :class="{ 'mobile': $device.isMobile }">
+      <div class="tabs-container" :class="{ 'scrollable': $device.isMobile }">
+        <div
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="tab-item"
+          :class="{ 'active': activeTab === tab.id }"
+          @click="setActiveTab(tab.id)"
+        >
+          {{ tab.title }}
+          <span v-if="tab.count" class="tab-count">{{ tab.count }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 
-const props = defineProps({
-  logo: {
-    type: String,
-    default: "/icons/header-logo.svg",
-  },
+defineProps({
   companyName: {
     type: String,
     default: "Наследие",
-  },
-  verifiedText: {
-    type: String,
-    default: "Документы проверены",
   },
   rating: {
     type: Number,
@@ -120,190 +62,135 @@ const props = defineProps({
     type: Number,
     default: 19,
   },
-  reviewsText: {
-    type: String,
-    default: "отзывов",
-  },
-  contactBtnText: {
-    type: String,
-    default: "Показать номер телефона",
-  },
-  phoneNumber: {
-    type: String,
-    default: "+7 (999) 123-45-67",
-  },
-  tabs: {
-    type: Array,
-    default: () => [
-      { label: "Товары и услуги", count: null },
-      { label: "Агенты", count: 5 },
-      { label: "О компании", count: null },
-    ],
-  },
-  activeTab: {
-    type: Number,
-    default: 0,
-  },
 });
 
-const emit = defineEmits(["update:activeTab"]);
+const { showDevDialog } = useDevDialog();
 
-const isPhoneVisible = ref(false);
-const showCopySnackbar = ref(false);
+const tabs = ref([
+  { id: "products", title: "Товары и услуги", count: 29 },
+  { id: "agents", title: "Агенты", count: 5 },
+  { id: "about", title: "О компании" },
+]);
 
-const togglePhone = () => {
-  isPhoneVisible.value = !isPhoneVisible.value;
-};
+const activeTab = ref("products");
 
-const copyPhoneToClipboard = () => {
-  navigator.clipboard.writeText(props.phoneNumber).then(() => {
-    showCopySnackbar.value = true;
-  });
-};
-
-const callPhone = () => {
-  window.location.href = `tel:${props.phoneNumber.replace(/\D/g, "")}`;
-};
-
-const updateTab = (index) => {
-  emit("update:activeTab", index);
-};
+function setActiveTab(tabId: string) {
+  activeTab.value = tabId;
+}
 </script>
 
 <style scoped>
 .company-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.header-logo-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.header-logo {
-  border-radius: 16px;
-}
-
-.company-name {
-  font-family: "Inter", sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #18181b;
-}
-
-.company-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  color: #52525b;
-  line-height: 1.5;
-}
-
-.info-container {
-  display: flex;
-  align-items: center;
-}
-
-.dot-divider {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: #71717a;
-  margin: 0 8px;
-}
-
-.phone-action-container {
-  position: relative;
   width: 100%;
+  background-color: #ffffff;
+}
+
+.header-info {
+  padding: 32px 64px;
+  display: flex;
+  flex-direction: column;
+}
+
+.company-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.company-verification {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.verification-badge {
+  display: flex;
+  align-items: center;
+}
+
+.verification-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.separator {
+  margin: 0 8px;
+  color: #888;
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reviews-count {
+  color: #666;
+  margin-left: 4px;
 }
 
 .contact-btn {
-  height: 56px;
-  font-family: "Inter", sans-serif;
-  font-size: 15px;
+  align-self: flex-start;
+  margin-top: 16px;
+  height: 48px;
   font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
-  color: white;
-  width: 100%;
-  min-width: 240px;
 }
 
-.phone-popup {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  overflow: hidden;
+.tabs-section {
+  border-bottom: 1px solid #eee;
+  padding: 0 64px;
 }
 
-.phone-popup-content {
-  padding: 16px;
+.tabs-section.mobile {
+  padding: 0;
+  border-bottom: none;
 }
 
-.phone-number {
-  display: block;
-  font-family: "Inter", sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #18181b;
-  margin-bottom: 12px;
-  text-align: center;
-}
-
-.phone-actions {
+.tabs-container {
   display: flex;
-  justify-content: center;
   gap: 16px;
 }
 
-.copy-btn,
-.call-btn {
-  text-transform: none;
-  letter-spacing: 0;
+.tabs-container.scrollable {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и Edge */
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px;
+  gap: 8px;
+  margin: 0;
+  background-color: white;
 }
 
-.navigation-tabs {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
+.tabs-container.scrollable::-webkit-scrollbar {
+  display: none;
 }
 
-.tab-btn {
-  font-family: "Inter", sans-serif;
-  font-size: 17px;
+.tab-item {
+  padding: 12px 24px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  cursor: pointer;
   font-weight: 500;
-  color: #27272a;
-  text-transform: none;
-  letter-spacing: 0;
-  border: 1px solid #e4e4e7 !important;
-  background-color: #f4f4f5;
-  border-radius: 16px !important;
-  padding: 0 20px !important;
-  height: 48px;
+  transition: all 0.2s ease;
 }
 
-.active-tab {
-  background-color: #ffffff;
-  border-width: 2px !important;
-  border-color: #e4e4e7 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.tabs-container.scrollable .tab-item {
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 14px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.tab-item.active {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 .tab-count {
-  font-size: 16px;
-  color: #71717a;
   margin-left: 4px;
 }
 </style>
