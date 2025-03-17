@@ -1,12 +1,7 @@
 <template>
   <div>
     <!-- Desktop -->
-    <v-app-bar
-      v-if="!$device.isMobile"
-      color="#FFF7EB"
-      elevation="0"
-      height="64"
-    >
+    <v-app-bar v-if="!isMobileView" color="#FFF7EB" elevation="0" height="64">
       <div class="d-flex align-center w-100 px-8">
         <div class="logo-container mr-3" @click="showDevDialog">
           <v-img src="/images/logo.svg" width="156" height="48"></v-img>
@@ -73,6 +68,32 @@
 
 <script setup lang="ts">
 import { useDevDialog } from "~/composables/useDevDialog";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+
+// Проверка на мобильное устройство без использования $device
+const windowWidth = ref(
+  typeof window !== "undefined" ? window.innerWidth : 1200
+);
+const isMobileView = computed(() => windowWidth.value < 960);
+
+// Обработчик изменения размера окна
+const updateWidth = () => {
+  if (typeof window !== "undefined") {
+    windowWidth.value = window.innerWidth;
+  }
+};
+
+// Установка и удаление слушателя событий
+onMounted(() => {
+  updateWidth(); // Инициализация ширины при монтировании
+  window.addEventListener("resize", updateWidth);
+});
+
+onBeforeUnmount(() => {
+  if (typeof window !== "undefined") {
+    window.removeEventListener("resize", updateWidth);
+  }
+});
 
 defineProps({
   categoriesText: {

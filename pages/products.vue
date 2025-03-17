@@ -1,32 +1,30 @@
 <template>
   <TheNavbar />
-  <CompanyHeader
-    logo="/icons/header-logo.svg"
-    companyName="Наследие"
-    verifiedText="Документы проверены"
-    :rating="4.7"
-    :reviewsCount="19"
-    reviewsText="отзывов"
-    contactBtnText="Показать номер телефона"
-    :tabs="tabs"
-    :activeTab="activeTab"
-    @update:activeTab="updateActiveTab"
-  />
+  <v-container class="content-container mt-md-12 mt-0">
+    <CompanyHeader
+      logo="/icons/header-logo.svg"
+      companyName="Наследие"
+      :rating="4.7"
+      :reviewsCount="19"
+      :tabs="tabs"
+      v-model="activeTab"
+    />
+  </v-container>
 
   <v-container class="content-container py-6" v-if="activeTab === 0">
     <ProductsGallery :products="products" :categories="categories" />
   </v-container>
 
-  <v-container class="py-6" v-else-if="activeTab === 1">
+  <div class="py-6" v-else-if="activeTab === 1">
     <AgentsList v-if="agentsLoaded" :agents="agents" />
     <div v-else class="d-flex justify-center pa-8">
       <v-progress-circular indeterminate color="#337566"></v-progress-circular>
     </div>
-  </v-container>
+  </div>
 
-  <v-container class="py-6" v-else-if="activeTab === 2">
+  <div class="company-container py-6" v-else-if="activeTab === 2">
     <CompanyInfo :company="companyData" />
-  </v-container>
+  </div>
 
   <TheFooter
     copyrightText="Annonce 2023"
@@ -68,8 +66,8 @@ const products = ref([
     date: "2 дня",
     price: 4800000,
     title: "2-к. квартира, 46 м², 1/5 эт.",
-    description: "Уютная квартира в центре города",
     categoryId: "category1",
+    isPromoted: false,
   },
   {
     id: 2,
@@ -78,8 +76,8 @@ const products = ref([
     date: "1 день",
     price: 450000,
     title: "Цифровое пианино Nord Stage 3",
-    description: "Профессиональное цифровое пианино",
     categoryId: "category1",
+    isPromoted: true,
   },
   {
     id: 3,
@@ -88,8 +86,9 @@ const products = ref([
     date: "3 дня",
     price: 3285000,
     title: "Hyundai Sonata 2.5 AT, 2022, 36 км",
-    description: "Автомобиль в идеальном состоянии",
     categoryId: "graves",
+    isPromoted: false,
+    hidden: true,
   },
   {
     id: 4,
@@ -98,8 +97,8 @@ const products = ref([
     date: "6 дней",
     price: 4800000,
     title: "2-к. квартира, 40 м², 10 эт.",
-    description: "С мебелью и ремонтом",
     categoryId: "urns",
+    isPromoted: true,
   },
   {
     id: 5,
@@ -108,8 +107,8 @@ const products = ref([
     date: "2 дня",
     price: 4800000,
     title: "2-к. квартира, 46 м², 1/5 эт.",
-    description: "Уютная квартира в центре города",
     categoryId: "category1",
+    isPromoted: false,
   },
   {
     id: 6,
@@ -118,8 +117,8 @@ const products = ref([
     date: "1 день",
     price: 450000,
     title: "Цифровое пианино Nord Stage 3",
-    description: "Профессиональное цифровое пианино",
     categoryId: "category1",
+    isPromoted: true,
   },
   {
     id: 7,
@@ -128,8 +127,8 @@ const products = ref([
     date: "3 дня",
     price: 3285000,
     title: "Hyundai Sonata 2.5 AT, 2022, 36 км",
-    description: "Автомобиль в идеальном состоянии",
     categoryId: "graves",
+    isPromoted: false,
   },
   {
     id: 8,
@@ -138,8 +137,8 @@ const products = ref([
     date: "6 дней",
     price: 4800000,
     title: "2-к. квартира, 40 м², 10 эт.",
-    description: "С мебелью и ремонтом",
     categoryId: "urns",
+    isPromoted: true,
   },
 ]);
 
@@ -256,5 +255,18 @@ onMounted(() => {
   padding-left: 0 !important;
   padding-right: 0 !important;
   max-width: 100% !important;
+}
+
+.company-container {
+  max-width: 560px !important;
+  margin: 0 auto;
+}
+
+@media (max-width: 959px) {
+  .company-container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
 </style>

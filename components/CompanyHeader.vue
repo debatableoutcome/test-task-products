@@ -1,55 +1,127 @@
 <template>
   <div class="company-header">
-    <div v-if="!$device.isMobile" class="header-info">
-      <h1 class="company-title">{{ companyName }}</h1>
+    <div class="header-content">
+      <div class="d-none d-md-block pa-0 ma-0">
+        <div class="center-wrapper">
+          <div v-if="logo" class="logo-container">
+            <img :src="logo" alt="Company logo" class="company-logo" />
+          </div>
 
-      <div class="company-verification">
-        <div class="verification-badge">
-          <v-icon color="green" size="small" class="mr-1">
-            mdi-check-circle
-          </v-icon>
-          <span class="verification-text">Документы проверены</span>
-        </div>
+          <h1 class="company-name">{{ companyName }}</h1>
 
-        <div class="rating-container">
-          <span class="separator">•</span>
-          <v-icon color="amber" size="small" class="mr-1"> mdi-star </v-icon>
-          <span>{{ rating }}</span>
-          <span class="reviews-count">{{ reviewsCount }} отзывов</span>
+          <div class="verification-rating">
+            <div class="verified">
+              <img
+                src="/icons/verified.svg"
+                alt="Verified"
+                class="verified-icon"
+              />
+              <span>Документы проверены</span>
+            </div>
+            <span class="dot-divider">•</span>
+            <div class="rating">
+              <img src="/icons/star.svg" alt="Star" class="star-icon" />
+              <span>{{ rating }}</span>
+            </div>
+            <span class="dot-divider">•</span>
+            <span class="reviews">{{ reviewsCount }} отзывов</span>
+          </div>
+
+          <button class="phone-button" @click="showPhoneNumber">
+            Показать номер телефона
+          </button>
         </div>
       </div>
 
-      <v-btn
-        color="#337566"
-        variant="outlined"
-        class="contact-btn"
-        @click="showDevDialog"
-      >
-        Показать номер телефона
-      </v-btn>
+      <v-dialog v-model="phoneDialog" max-width="400">
+        <v-card>
+          <v-card-title class="phone-dialog-title">
+            Номер телефона
+          </v-card-title>
+          <v-card-text class="phone-dialog-content">
+            <div class="phone-number">{{ phoneNumber }}</div>
+            <div class="action-buttons">
+              <v-btn
+                color="#337566"
+                variant="filled"
+                class="copy-button"
+                @click="copyPhoneNumber"
+              >
+                Копировать
+              </v-btn>
+              <v-btn
+                color="#337566"
+                variant="filled"
+                class="call-button"
+                @click="callPhoneNumber"
+              >
+                Позвонить
+              </v-btn>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
 
-    <div class="tabs-section" :class="{ 'mobile': $device.isMobile }">
-      <div class="tabs-container" :class="{ 'scrollable': $device.isMobile }">
-        <div
-          v-for="tab in tabs"
-          :key="tab.id"
-          class="tab-item"
-          :class="{ 'active': activeTab === tab.id }"
-          @click="setActiveTab(tab.id)"
-        >
-          {{ tab.title }}
-          <span v-if="tab.count" class="tab-count">{{ tab.count }}</span>
-        </div>
+    <!-- Tabs -->
+    <div
+      ref="tabsContainer"
+      class="tabs-container"
+      :class="{ 'mobile': isMobile }"
+    >
+      <div
+        v-for="(tab, index) in tabs"
+        :key="index"
+        ref="tabItems"
+        class="tab"
+        :class="{ 'active': modelValue === index }"
+        @click="handleTabClick(index)"
+      >
+        {{ tab.label }}
+        <span v-if="tab.count" class="tab-count">{{ tab.count }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, nextTick } from "vue";
+import { useDevice } from "@/composables/useDevice";
+import { useDevDialog } from "@/composables/useDevDialog";
 
-defineProps({
+const { isMobile } = useDevice();
+const { showDevDialog } = useDevDialog();
+
+// Phone dialog
+const phoneDialog = ref(false);
+const phoneNumber = ref("+7 (999) 123-45-67");
+
+// Tabs scrolling references
+const tabsContainer = ref(null);
+const tabItems = ref([]);
+
+const showPhoneNumber = () => {
+  phoneDialog.value = true;
+};
+
+const copyPhoneNumber = () => {
+  navigator.clipboard
+    .writeText(phoneNumber.value)
+    .then(() => {})
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+    });
+};
+
+const callPhoneNumber = () => {
+  window.location.href = `tel:${phoneNumber.value.replace(/[^0-9+]/g, "")}`;
+};
+
+const props = defineProps({
+  logo: {
+    type: String,
+    default: "",
+  },
   companyName: {
     type: String,
     default: "Наследие",
@@ -62,135 +134,236 @@ defineProps({
     type: Number,
     default: 19,
   },
+  tabs: {
+    type: Array,
+    default: () => [],
+  },
+  modelValue: {
+    type: Number,
+    default: 0,
+  },
 });
 
-const { showDevDialog } = useDevDialog();
+const emit = defineEmits(["update:modelValue"]);
 
-const tabs = ref([
-  { id: "products", title: "Товары и услуги", count: 29 },
-  { id: "agents", title: "Агенты", count: 5 },
-  { id: "about", title: "О компании" },
-]);
+const handleTabClick = (index) => {
+  emit("update:modelValue", index);
 
-const activeTab = ref("products");
+  if (isMobile.value && tabsContainer.value && tabItems.value[index]) {
+    nextTick(() => {
+      const container = tabsContainer.value;
+      const tab = tabItems.value[index];
 
-function setActiveTab(tabId: string) {
-  activeTab.value = tabId;
-}
+      const containerWidth = container.offsetWidth;
+      const tabWidth = tab.offsetWidth;
+      const tabLeft = tab.offsetLeft;
+
+      container.scrollTo({
+        left: tabLeft - containerWidth / 2 + tabWidth / 2,
+        behavior: "smooth",
+      });
+    });
+  }
+};
+
+onMounted(() => {
+  if (isMobile.value && props.modelValue !== undefined) {
+    nextTick(() => {
+      handleTabClick(props.modelValue);
+    });
+  }
+});
 </script>
 
 <style scoped>
 .company-header {
-  width: 100%;
-  background-color: #ffffff;
+  margin: 0 auto;
+  padding: 16px 0;
+  max-width: 400px;
 }
 
-.header-info {
-  padding: 32px 64px;
+.header-content {
+  padding: 0 16px;
+}
+
+/* Один центрирующий контейнер */
+.center-wrapper {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
 }
 
-.company-title {
-  font-size: 32px;
+.logo-container {
+  margin-bottom: 12px;
+  width: 64px;
+  height: 64px;
+}
+
+.company-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.company-name {
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin: 8px 0 4px 0;
+  color: #000;
 }
 
-.company-verification {
+.verification-rating {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  justify-content: center;
+  margin: 4px 0 16px 0;
+  flex-wrap: wrap;
 }
 
-.verification-badge {
+.verified {
   display: flex;
   align-items: center;
 }
 
-.verification-text {
-  font-size: 14px;
-  color: #333;
+.verified-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
 }
 
-.separator {
+.dot-divider {
   margin: 0 8px;
   color: #888;
 }
 
-.rating-container {
+.rating {
   display: flex;
   align-items: center;
-  gap: 4px;
 }
 
-.reviews-count {
+.star-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.reviews {
   color: #666;
-  margin-left: 4px;
 }
 
-.contact-btn {
-  align-self: flex-start;
-  margin-top: 16px;
-  height: 48px;
-  font-weight: 500;
+.phone-button {
+  height: 44px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  background-color: #337566;
+  color: white;
+  width: 100%;
+  max-width: 240px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0 16px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
 }
 
-.tabs-section {
-  border-bottom: 1px solid #eee;
-  padding: 0 64px;
-}
-
-.tabs-section.mobile {
-  padding: 0;
-  border-bottom: none;
+.phone-button:hover {
+  background-color: #2a6155;
 }
 
 .tabs-container {
   display: flex;
-  gap: 16px;
-}
-
-.tabs-container.scrollable {
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE и Edge */
-  -webkit-overflow-scrolling: touch;
-  padding: 12px 16px;
+  justify-content: center;
   gap: 8px;
-  margin: 0;
-  background-color: white;
+  width: 100%;
+  padding: 0 16px;
+  margin-top: 16px;
 }
 
-.tabs-container.scrollable::-webkit-scrollbar {
+.tabs-container.mobile {
+  overflow-x: auto;
+  white-space: nowrap;
+  justify-content: flex-start;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  padding-bottom: 8px;
+}
+
+.tabs-container.mobile::-webkit-scrollbar {
   display: none;
 }
 
-.tab-item {
-  padding: 12px 24px;
-  border-radius: 8px;
-  background-color: #f5f5f5;
+.tab {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background-color: #f8f8f8;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  scroll-snap-align: center;
+  border: 1px solid transparent;
+  color: #333;
 }
 
-.tabs-container.scrollable .tab-item {
-  padding: 8px 16px;
-  border-radius: 30px;
-  font-size: 14px;
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-.tab-item.active {
-  background-color: #000000;
-  color: #ffffff;
+.tab.active {
+  border: 1px solid #333;
 }
 
 .tab-count {
   margin-left: 4px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 13px;
+  color: #555;
+}
+
+.phone-dialog-title {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.phone-dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.phone-number {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.copy-button,
+.call-button {
+  flex: 1;
+  max-width: 150px;
+}
+
+@media (max-width: 767px) {
+  .tabs-container {
+    padding-bottom: 12px;
+  }
 }
 </style>

@@ -33,7 +33,8 @@ defineProps({
 <style scoped>
 .footer {
   border-top: 1px solid #e0e0e0;
-  padding: 16px 0;
+
+  height: 88px;
 }
 
 .footer-content {

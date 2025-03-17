@@ -1,5 +1,5 @@
 <template>
-  <div class="products-gallery">
+  <div class="products-gallery" :class="{ 'mobile': isMobile }">
     <div class="select-container">
       <CategorySelect
         :categories="categories"
@@ -20,9 +20,8 @@
           :date="product.date"
           :price="product.price"
           :title="product.title"
-          :description="product.description"
-          :isSold="product.isSold"
-          :isHidden="product.isHidden"
+          :isPromoted="product.isPromoted || false"
+          :isHidden="product.isHidden || false"
         />
       </div>
     </div>
@@ -34,6 +33,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watchEffect } from "vue";
+import { useDevice } from "@/composables/useDevice"; // Добавлен импорт
+
+const { isMobile } = useDevice(); // Получаем isMobile из composable
+
 const props = defineProps({
   products: {
     type: Array,
@@ -69,16 +73,28 @@ watchEffect(() => {
   padding: 0 32px;
 }
 
+.products-gallery.mobile {
+  padding: 0 8px;
+}
+
 .select-container {
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
 }
 
+.products-gallery.mobile .select-container {
+  margin-bottom: 16px;
+}
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+}
+
+.products-gallery.mobile .products-grid {
+  gap: 8px;
 }
 
 .product-item {
@@ -91,6 +107,10 @@ watchEffect(() => {
   color: #71717a;
   font-family: "Inter", sans-serif;
   font-size: 16px;
+}
+
+.products-gallery.mobile .no-products {
+  padding: 32px 0;
 }
 
 @media (max-width: 1200px) {
