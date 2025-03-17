@@ -223,7 +223,6 @@ const todayHoursMessage = computed(() => {
 
 .mobile-view .section-title {
   font-size: 20px;
-  padding: 0 16px;
 }
 
 .hours-title :deep(.section-title) {
