@@ -92,11 +92,9 @@ import { useDevDialog } from "@/composables/useDevDialog";
 const { isMobile } = useDevice();
 const { showDevDialog } = useDevDialog();
 
-// Phone dialog
 const phoneDialog = ref(false);
 const phoneNumber = ref("+7 (999) 123-45-67");
 
-// Tabs scrolling references
 const tabsContainer = ref(null);
 const tabItems = ref([]);
 
@@ -186,7 +184,6 @@ onMounted(() => {
   padding: 0 16px;
 }
 
-/* Один центрирующий контейнер */
 .center-wrapper {
   display: flex;
   flex-direction: column;
@@ -283,8 +280,8 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  padding: 0 16px;
+  width: auto;
+
   margin-top: 16px;
 }
 
@@ -308,7 +305,7 @@ onMounted(() => {
   border-radius: 12px;
   background-color: #f8f8f8;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
