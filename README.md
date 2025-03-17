@@ -1,75 +1,167 @@
-# Nuxt Minimal Starter
+# Тестовое задание Vue/Nuxt
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Данный проект представляет собой реализацию страницы "Товары и услуги" с адаптивным дизайном, JWT-авторизацией и использованием современных подходов к разработке на Vue 3 и Nuxt 3.
 
-## Setup
+## Реализованная функциональность
 
-Make sure to install dependencies:
+- Адаптивный дизайн (мобильная версия до 960px, десктопная от 960px)
+- JWT-авторизация на странице /login
+- Защищенный роут /products
+- Вывод данных о компании, полученных через Nuxt Server Routes
+- Компонентная архитектура с использованием Composition API
+
+## Технологический стек
+
+- Vue 3 / Nuxt 3
+- TypeScript
+- Vuetify 3
+- Composables для определения устройства
+- ESLint и Prettier для форматирования кода
+- JWT-авторизация
+
+## Настройка проекта
+
+Установите зависимости:
 
 ```bash
 # npm
 npm install
 
-# pnpm
-pnpm install
-
 # yarn
 yarn install
 
-# bun
-bun install
+# pnpm
+pnpm install
 ```
 
-## Development Server
+## Запуск для разработки
 
-Start the development server on `http://localhost:3000`:
+Запустите сервер разработки на `http://localhost:3000`:
 
 ```bash
 # npm
 npm run dev
 
-# pnpm
-pnpm dev
-
 # yarn
 yarn dev
 
-# bun
-bun run dev
+# pnpm
+pnpm dev
 ```
 
-## Production
+## Сборка для продакшена
 
-Build the application for production:
+Соберите приложение для продакшена:
 
 ```bash
 # npm
 npm run build
 
-# pnpm
-pnpm build
-
 # yarn
 yarn build
 
-# bun
-bun run build
+# pnpm
+pnpm build
 ```
 
-Locally preview production build:
+Локальный предпросмотр продакшен-сборки:
 
 ```bash
 # npm
 npm run preview
 
-# pnpm
-pnpm preview
-
 # yarn
 yarn preview
 
-# bun
-bun run preview
+# pnpm
+pnpm preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Авторизация
+
+Для авторизации используйте следующие учетные данные:
+
+- Логин: `admin`
+- Пароль: `secret`
+
+## Структура проекта
+
+```
+├── components/         # UI компоненты
+│   ├── AgentCard.vue   # Карточка агента
+│   ├── AgentsList.vue  # Список агентов
+│   ├── CategorySelect.vue  # Селектор категорий
+│   ├── CompanyHeader.vue   # Хедер компании
+│   ├── CompanyInfo.vue     # Информация о компании
+│   ├── ProductCard.vue     # Карточка товара
+│   ├── ProductsGallery.vue # Галерея товаров
+│   └── ...
+├── composables/        # Переиспользуемая логика
+│   ├── useAuth.ts      # Логика авторизации
+│   └── useDevice.ts    # Определение устройства
+├── layouts/            # Шаблоны страниц
+├── pages/              # Страницы приложения
+│   ├── index.vue       # Главная страница
+│   ├── login.vue       # Страница авторизации
+│   └── products.vue    # Страница товаров
+├── server/             # Серверная логика
+│   └── routes/         # API роуты
+├── middleware/         # Промежуточные обработчики
+│   ├── auth.ts         # Проверка авторизации
+│   └── redirect.ts     # Редирект с главной
+└── ...
+```
+
+## Известные ограничения и дальнейшие улучшения
+
+- Для продакшен-версии рекомендуется добавить обработку ошибок API
+- Можно расширить функциональность добавлением сортировки и пагинации товаров
+- В будущем планируется добавление юнит-тестов с использованием Vitest
+
+## Дизайн
+
+Дизайн реализован на основе [макета в Figma](https://www.figma.com/file/SjWd29tkFK4TzGbZkthn6j/Front-Test-2024?node-id=3%3A638&mode=dev)
+
+## Решение проблем
+
+### Особенности определения мобильных устройств
+
+В проекте используется composable `useDevice`, который определяет тип устройства на основе ширины экрана. Для корректной работы компонента необходимо:
+
+1. Импортировать composable в каждый компонент:
+
+```js
+import { useDevice } from "@/composables/useDevice";
+```
+
+2. Инициализировать в секции setup:
+
+```js
+const { isMobile } = useDevice();
+```
+
+3. Использовать переменную `isMobile` вместо `$device.isMobile` в шаблонах:
+
+```html
+<div :class="{ 'mobile': isMobile }"></div>
+```
+
+### Отступы в Vuetify
+
+Vuetify применяет свои стандартные отступы к некоторым компонентам (например, v-container) с использованием !important. Для переопределения этих стилей в мобильной версии используется следующий подход:
+
+```css
+.component-class.mobile :deep(.v-container) {
+  padding: 0 !important;
+}
+```
+
+## Комментарии к решению
+
+При разработке проекта особое внимание уделялось:
+
+1. Чистоте и читаемости кода
+2. Правильной организации компонентов
+3. Производительности (ленивая загрузка, кэширование)
+4. Типизации для повышения надежности
+5. Адаптивности для разных устройств
